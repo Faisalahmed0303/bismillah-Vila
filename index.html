@@ -1,211 +1,55 @@
-<!DOCTYPE html>
-<html lang="bn">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>বিসমিল্লাহ ভিলা - স্মার্ট রসিদ</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <style>
-        body { font-family: 'Arial', sans-serif; background-color: #f0f2f5; padding: 10px; margin: 0; }
-        .container { max-width: 450px; margin: auto; background: #fff; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); overflow: hidden; border-top: 6px solid #2e7d32; }
-        .config-section { background: #e8f5e9; padding: 15px; border-bottom: 1px solid #ddd; font-size: 13px; }
-        .main-content { padding: 20px; }
-        .header { text-align: center; border-bottom: 1px dashed #000; padding-bottom: 10px; margin-bottom: 15px; }
-        .header h1 { margin: 0; font-size: 24px; color: #1b5e20; }
-        .header p { margin: 2px 0; font-size: 13px; color: #444; }
-        
-        label { font-weight: bold; font-size: 13px; display: block; margin-top: 10px; color: #333; }
-        input, select { width: 100%; padding: 10px; margin: 5px 0; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; font-size: 15px; }
-        
-        .btn-group { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 15px; }
-        button { flex: 1; min-width: 100px; padding: 12px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 14px; }
-        .calc-btn { background: #2e7d32; color: white; }
-        .download-btn { background: #1976d2; color: white; display: none; }
-        .print-btn { background: #333; color: white; display: none; }
-
-        .result-area { margin-top: 20px; padding: 15px; background: white; border: 1px solid #eee; border-radius: 8px; }
-        .res-row { display: flex; justify-content: space-between; font-size: 15px; margin-bottom: 6px; border-bottom: 1px solid #f9f9f9; }
-        .total { font-size: 20px; font-weight: bold; color: #d32f2f; border-top: 2px solid #000; padding-top: 8px; margin-top: 10px; }
-        .footer-sign { margin-top: 30px; display: flex; justify-content: space-between; padding-top: 20px; }
-        .sign-line { border-top: 1px solid #000; width: 110px; text-align: center; font-size: 12px; font-weight: bold; }
-        .thanks-note { text-align: center; font-size: 14px; font-weight: bold; margin-top: 20px; color: #1b5e20; border-top: 1px dashed #ccc; padding-top: 10px; }
-
-        @media print {
-            .config-section, input, select, .btn-group, label { display: none !important; }
-            body { background: white; }
-            .container { box-shadow: none; border: none; width: 100%; }
-        }
-    </style>
-</head>
-<body>
-
-<div class="container">
-    <div class="config-section" id="config">
-        <strong>ভাড়াটিয়া তালিকা (মাস্টার সেটিংস):</strong><br>
-        <small>নামগুলো কমা দিয়ে লিখুন এবং একটি স্পেস দিন:</small>
-        <input type="text" id="tenantListInput" value="আব্দুর রহমান, শরিফ মিয়া, দোকান-১">
+<div id="output" class="result-area" style="display:none;">
+    <div style="text-align:center; border-bottom: 2px solid #2e7d32; padding-bottom: 5px; margin-bottom: 10px;">
+        <strong style="font-size: 18px; color: #1b5e20;">বিদ্যুৎ বিল রসিদ</strong><br>
+        <span style="font-size: 14px;">বিলের মাস: <span id="resMonth"></span> <span id="resYear"></span></span>
+    </div>
+    
+    <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 10px;">
+        <span>রসিদ নং: #<span id="receiptNo"></span></span>
+        <span>তারিখ: <span id="resDate"></span></span>
     </div>
 
-    <div class="main-content" id="printArea">
-        <div class="header">
-            <div style="font-size: 30px;">🏠</div>
-            <h1>বিসমিল্লাহ ভিলা</h1>
-            <p>৭৪০/১ গাছা ইসলামপুর মসজিদ রোড, গাজীপুর।</p>
-            <p>মোবাইল: ০১৭১৫৬৫৩০৫৬</p>
-        </div>
-
-        <label>ভাড়াটিয়ার নাম:</label>
-        <select id="tenantName"></select>
-
-        <label>দোকান/ফ্ল্যাট নম্বর:</label>
-        <input type="text" id="flatNo" placeholder="যেমন: দোকান-১০">
-
-        <label>মাসের নাম:</label>
-        <select id="billMonth">
-            <option>জানুয়ারি</option><option>ফেব্রুয়ারি</option><option>মার্চ</option><option>এপ্রিল</option>
-            <option>মে</option><option>জুন</option><option>জুলাই</option><option>আগস্ট</option>
-            <option>সেপ্টেম্বর</option><option>অক্টোবর</option><option>নভেম্বর</option><option>ডিসেম্বর</option>
-        </select>
-
-        <label>বর্তমান রিডিং:</label>
-        <input type="number" id="present">
-
-        <label>পূর্বের রিডিং:</label>
-        <input type="number" id="previous">
-
-        <label>পূর্ববর্তী বকেয়া (টাকা):</label>
-        <input type="number" id="arrear" value="0">
-
-        <div class="btn-group">
-            <button class="calc-btn" onclick="calculateBill()">হিসাব ও রসিদ তৈরি</button>
-            <button class="download-btn" id="dBtn" onclick="downloadImage()">ছবি ডাউনলোড</button>
-            <button class="print-btn" id="pBtn" onclick="window.print()">প্রিন্ট</button>
-        </div>
-
-        <div id="output" class="result-area" style="display:none;">
-            <div style="text-align:center;">
-                <strong style="font-size: 16px;">বিদ্যুৎ বিল রসিদ - <span id="resMonth"></span> <span id="resYear"></span></strong><br>
-                <small>তারিখ: <span id="resDate"></span></small>
-            </div>
-            <br>
-            <div class="res-row"><span>ভাড়াটিয়া:</span> <strong id="resName"></strong></div>
-            <div class="res-row"><span>দোকান/ফ্ল্যাট:</span> <span id="resFlat"></span></div>
-            <hr>
-            <div class="res-row"><span>ব্যবহৃত ইউনিট:</span> <strong id="usedUnits">০</strong></div>
-            <div class="res-row"><span>বিদ্যুৎ বিল:</span> <span id="energy">০</span></div>
-            <div class="res-row"><span>ডিমান্ড ও মিটার চার্জ:</span> <span>৬০ টাকা</span></div>
-            <div class="res-row"><span>ভ্যাট (৫%):</span> <span id="vat">০</span></div>
-            <div class="res-row"><span>পূর্ববর্তী বকেয়া:</span> <span id="resArrear">০</span></div>
-            <div class="res-row total"><span>মোট প্রদেয় বিল:</span> <span id="total">০</span> টাকা</div>
-            
-            <div class="footer-sign">
-                <div class="sign-line">ভাড়াটিয়ার স্বাক্ষর</div>
-                <div class="sign-line">মালিকের স্বাক্ষর</div>
-            </div>
-            
-            <div class="thanks-note">ধন্যবাদান্তে: বিসমিল্লাহ ভিলা</div>
+    <div class="res-row"><span>ভাড়াটিয়া:</span> <strong id="resName" style="font-size: 16px;"></strong></div>
+    <div class="res-row"><span>দোকান/ফ্ল্যাট:</span> <span id="resFlat"></span></div>
+    
+    <div style="background: #f9f9f9; padding: 8px; border-radius: 5px; margin: 10px 0; border: 1px solid #eee;">
+        <div class="res-row" style="font-size: 12px;"><span>বর্তমান রিডিং:</span> <span id="resPres"></span></div>
+        <div class="res-row" style="font-size: 12px;"><span>পূর্বের রিডিং:</span> <span id="resPrev"></span></div>
+        <div class="res-row" style="font-weight: bold; border-top: 1px solid #ccc; padding-top: 3px;">
+            <span>মোট ব্যবহৃত ইউনিট:</span> <span id="usedUnits"></span>
         </div>
     </div>
+
+    <div class="res-row"><span>বিদ্যুৎ বিল (চার্জ):</span> <span id="energy"></span></div>
+    <div class="res-row"><span>ডিমান্ড ও মিটার চার্জ:</span> <span>৬০ টাকা</span></div>
+    <div class="res-row"><span>ভ্যাট (৫%):</span> <span id="vat"></span></div>
+    <div class="res-row"><span>পূর্ববর্তী বকেয়া:</span> <span id="resArrear"></span></div>
+    
+    <div class="res-row total" style="background: #1b5e20; color: white; padding: 10px; border-radius: 5px; margin-top: 10px;">
+        <span>সর্বমোট প্রদেয় বিল:</span> <span id="total"></span> <span>টাকা</span>
+    </div>
+    
+    <div class="footer-sign">
+        <div class="sign-line">ভাড়াটিয়ার স্বাক্ষর</div>
+        <div class="sign-line">মালিকের স্বাক্ষর</div>
+    </div>
+    
+    <div class="thanks-note">ধন্যবাদান্তে: বিসমিল্লাহ ভিলা</div>
 </div>
 
 <script>
-    function updateDropdown() {
-        const inputField = document.getElementById('tenantListInput');
-        const input = inputField.value;
-        const names = input.split(',');
-        const select = document.getElementById('tenantName');
-        
-        select.innerHTML = "";
-        names.forEach(name => {
-            if(name.trim() !== ""){
-                let opt = document.createElement('option');
-                opt.value = name.trim();
-                opt.innerHTML = name.trim();
-                select.appendChild(opt);
-            }
-        });
-        localStorage.setItem('tenantList', input);
-    }
-
-    window.onload = function() {
-        const saved = localStorage.getItem('tenantList');
-        if(saved) {
-            document.getElementById('tenantListInput').value = saved;
-        }
-        updateDropdown();
-    };
-
-    // টাইপ করার সাথে সাথেই আপডেট হবে
-    document.getElementById('tenantListInput').addEventListener('input', updateDropdown);
-
-    function toBanglaNum(num) {
-        const banglaDigits = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
-        return num.toString().replace(/\d/g, d => banglaDigits[d]);
-    }
-
+    // জাভাস্ক্রিপ্ট ফাংশনের ভেতরে এই লাইনগুলো যোগ করবেন:
     function calculateBill() {
-        let pres = parseFloat(document.getElementById('present').value);
-        let prev = parseFloat(document.getElementById('previous').value);
-        let arrear = parseFloat(document.getElementById('arrear').value) || 0;
+        // ... আগের সব কোড ...
         
-        if (isNaN(pres) || isNaN(prev) || pres < prev) {
-            alert("সঠিক রিডিং দিন"); return;
-        }
-
-        let units = pres - prev;
-        let energy = 0;
-        if (units <= 50) energy = units * 4.63;
-        else if (units <= 75) energy = units * 5.26;
-        else if (units <= 200) energy = units * 7.20;
-        else if (units <= 300) energy = units * 7.59;
-        else if (units <= 400) energy = units * 8.02;
-        else if (units <= 600) energy = units * 12.67;
-        else energy = units * 14.61;
-
-        let vat = (energy + 60) * 0.05;
-        let grandTotal = energy + 60 + vat + arrear;
-
-        const now = new Date();
-        document.getElementById('resName').innerText = document.getElementById('tenantName').value;
-        document.getElementById('resFlat').innerText = document.getElementById('flatNo').value;
-        document.getElementById('resMonth').innerText = document.getElementById('billMonth').value;
-        document.getElementById('resYear').innerText = toBanglaNum(now.getFullYear());
-        document.getElementById('usedUnits').innerText = toBanglaNum(units);
-        document.getElementById('energy').innerText = toBanglaNum(energy.toFixed(2));
-        document.getElementById('vat').innerText = toBanglaNum(vat.toFixed(2));
-        document.getElementById('resArrear').innerText = toBanglaNum(arrear);
-        document.getElementById('total').innerText = toBanglaNum(Math.round(grandTotal));
-        document.getElementById('resDate').innerText = toBanglaNum(now.toLocaleDateString('bn-BD'));
-
-        document.getElementById('output').style.display = 'block';
-        document.getElementById('dBtn').style.display = 'block';
-        document.getElementById('pBtn').style.display = 'block';
-    }
-
-    function downloadImage() {
-        const element = document.getElementById('printArea');
-        const config = document.getElementById('config');
-        const btns = document.querySelectorAll('.btn-group');
-        const labels = element.querySelectorAll('label, input, select');
-
-        config.style.display = 'none';
-        btns.forEach(b => b.style.display = 'none');
-        labels.forEach(l => l.style.display = 'none');
-
-        html2canvas(element, { scale: 3 }).then(canvas => {
-            const link = document.createElement('a');
-            link.download = 'রসিদ-' + document.getElementById('tenantName').value + '.png';
-            link.href = canvas.toDataURL();
-            link.click();
-            
-            config.style.display = 'block';
-            btns.forEach(b => b.style.display = 'flex');
-            labels.forEach(l => l.style.display = 'block');
-            document.getElementById('dBtn').style.display = 'block';
-            document.getElementById('pBtn').style.display = 'block';
-        });
+        // রসিদ নম্বর (অটোমেটিক তৈরির জন্য)
+        let rNo = Math.floor(Date.now() / 100000);
+        document.getElementById('receiptNo').innerText = toBanglaNum(rNo);
+        
+        // রিডিং ভ্যালু দেখানো
+        document.getElementById('resPres').innerText = toBanglaNum(document.getElementById('present').value);
+        document.getElementById('resPrev').innerText = toBanglaNum(document.getElementById('previous').value);
+        
+        // বাকি অংশ আগের মতোই...
     }
 </script>
-
-</body>
-</html>
