@@ -42,7 +42,8 @@
 <div class="container">
     <div class="config-section" id="config">
         <strong>ভাড়াটিয়া তালিকা (মাস্টার সেটিংস):</strong><br>
-        <input type="text" id="tenantListInput" value="মিলন, শরিফ মিয়া, দোকান-১, দোকান-২" onchange="updateDropdown()">
+        <small>নামগুলো কমা দিয়ে লিখুন এবং একটি স্পেস দিন:</small>
+        <input type="text" id="tenantListInput" value="আব্দুর রহমান, শরিফ মিয়া, দোকান-১">
     </div>
 
     <div class="main-content" id="printArea">
@@ -109,24 +110,33 @@
 
 <script>
     function updateDropdown() {
-        const input = document.getElementById('tenantListInput').value;
+        const inputField = document.getElementById('tenantListInput');
+        const input = inputField.value;
         const names = input.split(',');
         const select = document.getElementById('tenantName');
+        
         select.innerHTML = "";
         names.forEach(name => {
-            let opt = document.createElement('option');
-            opt.value = name.trim();
-            opt.innerHTML = name.trim();
-            select.appendChild(opt);
+            if(name.trim() !== ""){
+                let opt = document.createElement('option');
+                opt.value = name.trim();
+                opt.innerHTML = name.trim();
+                select.appendChild(opt);
+            }
         });
         localStorage.setItem('tenantList', input);
     }
 
     window.onload = function() {
         const saved = localStorage.getItem('tenantList');
-        if(saved) document.getElementById('tenantListInput').value = saved;
+        if(saved) {
+            document.getElementById('tenantListInput').value = saved;
+        }
         updateDropdown();
     };
+
+    // টাইপ করার সাথে সাথেই আপডেট হবে
+    document.getElementById('tenantListInput').addEventListener('input', updateDropdown);
 
     function toBanglaNum(num) {
         const banglaDigits = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
@@ -144,7 +154,6 @@
 
         let units = pres - prev;
         let energy = 0;
-        // সাধারণ আবাসিক রেট (Slab অনুযায়ী নয়, গড় হিসাব দেওয়া হয়েছে পরিবর্তন করা যাবে)
         if (units <= 50) energy = units * 4.63;
         else if (units <= 75) energy = units * 5.26;
         else if (units <= 200) energy = units * 7.20;
@@ -176,12 +185,27 @@
     function downloadImage() {
         const element = document.getElementById('printArea');
         const config = document.getElementById('config');
-        const inputs = element.querySelectorAll('input, select, .btn-group, label');
-        
-        // ছবি সুন্দর করার জন্য ইনপুট লুকানো
+        const btns = document.querySelectorAll('.btn-group');
+        const labels = element.querySelectorAll('label, input, select');
+
         config.style.display = 'none';
-        inputs.forEach(el => el.style.display = 'none');
-        
-        html2canvas(element, { scale: 2 }).then(canvas => {
+        btns.forEach(b => b.style.display = 'none');
+        labels.forEach(l => l.style.display = 'none');
+
+        html2canvas(element, { scale: 3 }).then(canvas => {
             const link = document.createElement('a');
-            link.download = 'বিল-'
+            link.download = 'রসিদ-' + document.getElementById('tenantName').value + '.png';
+            link.href = canvas.toDataURL();
+            link.click();
+            
+            config.style.display = 'block';
+            btns.forEach(b => b.style.display = 'flex');
+            labels.forEach(l => l.style.display = 'block');
+            document.getElementById('dBtn').style.display = 'block';
+            document.getElementById('pBtn').style.display = 'block';
+        });
+    }
+</script>
+
+</body>
+</html>
