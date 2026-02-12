@@ -3,91 +3,137 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>বিদ্যুৎ বিল - বিসমিল্লাহ ভিলা</title>
+    <title>বিসমিল্লাহ ভিলা - স্মার্ট ক্যালকুলেটর</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
-        body { font-family: 'Arial', sans-serif; background-color: #f4f4f4; display: flex; justify-content: center; padding: 15px; margin: 0; }
-        .card { background: white; padding: 20px; border-radius: 12px; width: 100%; max-width: 350px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border-top: 5px solid #2e7d32; }
-        
-        /* লোগো আইকন স্টাইল */
-        .logo-icon { 
-            text-align: center; 
-            font-size: 50px; 
-            color: #2e7d32; 
-            margin-bottom: 5px; 
-        }
-
+        body { font-family: 'Arial', sans-serif; background-color: #f0f2f5; padding: 10px; margin: 0; }
+        .container { max-width: 450px; margin: auto; background: #fff; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); overflow: hidden; border-top: 6px solid #2e7d32; }
+        .config-section { background: #e8f5e9; padding: 15px; border-bottom: 1px solid #ddd; font-size: 13px; }
+        .main-content { padding: 20px; }
         .header { text-align: center; border-bottom: 1px dashed #000; padding-bottom: 10px; margin-bottom: 15px; }
-        .header h1 { margin: 0; font-size: 24px; color: #1b5e20; }
-        .header p { margin: 3px 0; font-size: 13px; color: #333; font-weight: bold; }
+        .header h1 { margin: 0; font-size: 22px; color: #1b5e20; }
+        .header p { margin: 2px 0; font-size: 12px; color: #444; }
         
-        label { font-weight: bold; font-size: 14px; display: block; margin-top: 12px; color: #444; }
-        input { width: 100%; padding: 12px; margin: 5px 0; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; font-size: 16px; background: #fafafa; }
+        label { font-weight: bold; font-size: 13px; display: block; margin-top: 10px; color: #333; }
+        input, select { width: 100%; padding: 10px; margin: 5px 0; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; font-size: 15px; }
         
-        .btn-group { display: flex; gap: 8px; margin-top: 15px; }
-        button { flex: 1; padding: 12px; border: none; border-radius: 8px; cursor: pointer; font-size: 15px; font-weight: bold; transition: 0.3s; }
+        .btn-group { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 15px; }
+        button { flex: 1; min-width: 100px; padding: 12px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 14px; }
         .calc-btn { background: #2e7d32; color: white; }
-        .print-btn { background: #000; color: white; display: none; }
-        button:active { transform: scale(0.98); }
+        .download-btn { background: #1976d2; color: white; display: none; }
+        .print-btn { background: #333; color: white; display: none; }
 
-        .result { margin-top: 20px; border-top: 1px solid #eee; padding-top: 10px; }
-        .res-row { display: flex; justify-content: space-between; font-size: 15px; margin-bottom: 6px; color: #333; }
-        .total { font-size: 20px; font-weight: bold; color: #d32f2f; border-top: 2px solid #000; padding-top: 8px; margin-top: 10px; }
+        .result-area { margin-top: 20px; padding: 15px; background: white; border: 1px solid #eee; border-radius: 8px; }
+        .res-row { display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 6px; border-bottom: 1px solid #f9f9f9; }
+        .total { font-size: 18px; font-weight: bold; color: #d32f2f; border-top: 2px solid #000; padding-top: 8px; margin-top: 10px; }
+        .footer-sign { margin-top: 25px; display: flex; justify-content: space-between; padding-top: 20px; }
+        .sign-line { border-top: 1px solid #000; width: 100px; text-align: center; font-size: 12px; }
 
         @media print {
-            body { background: white; padding: 0; margin: 0; }
-            input, .calc-btn, .print-btn, label { display: none !important; }
-            .card { box-shadow: none; border: none; width: 100%; max-width: 100%; padding: 0; }
-            .logo-icon { color: black; } /* প্রিন্টারে কালো আসবে */
+            .config-section, input, select, .btn-group, label { display: none !important; }
+            body { background: white; }
+            .container { box-shadow: none; border: none; width: 100%; }
         }
     </style>
 </head>
 <body>
 
-<div class="card" id="printArea">
-    <div class="logo-icon">🏠</div>
-    
-    <div class="header">
-        <h1>বিসমিল্লাহ ভিলা</h1>
-        <p>৭৪০/১ গাছা ইসলামপুর মসজিদ রোড,<br>বোর্ডবাজার, গাজীপুর।</p>
-        <p>মোবাইল নংঃ ০১৭১৫৬৫৩০৫৬</p>
-        <p>তারিখ: <span id="currentDate"></span></p>
-    </div>
-    
-    <label>বর্তমান রিডিং (ইউনিট):</label>
-    <input type="number" id="present" placeholder="ইংরেজিতে লিখুন">
-    
-    <label>পূর্বের রিডিং (ইউনিট):</label>
-    <input type="number" id="previous" placeholder="ইংরেজিতে লিখুন">
-
-    <div class="btn-group">
-        <button class="calc-btn" onclick="calculateBill()">বিলের হিসাব দেখুন</button>
-        <button class="print-btn" id="pBtn" onclick="window.print()">রশিদ প্রিন্ট করুন</button>
+<div class="container">
+    <div class="config-section" id="config">
+        <strong>মাস্টার সেটিংস (ভাড়াটিয়া তালিকা):</strong><br>
+        <small>নামগুলো কমা (,) দিয়ে লিখুন:</small>
+        <input type="text" id="tenantListInput" value="মিলন, শরিফ মিয়া, দোকান-১, দোকান-২" onchange="updateDropdown()">
     </div>
 
-    <div id="output" class="result" style="display:none;">
-        <div class="res-row"><span>মোট ব্যবহৃত ইউনিট:</span> <strong id="usedUnits">০</strong></div>
-        <div class="res-row"><span>বিদ্যুৎ বিল (চার্জ):</span> <span><span id="energy">০</span> টাকা</span></div>
-        <div class="res-row"><span>ডিমান্ড চার্জ:</span> <span>৫০ টাকা</span></div>
-        <div class="res-row"><span>মিটার ভাড়া:</span> <span>১০ টাকা</span></div>
-        <div class="res-row"><span>ভ্যাট (৫%):</span> <span><span id="vat">০</span> টাকা</span></div>
-        <div class="res-row total"><span>সর্বমোট বিল:</span> <span><span id="total">০</span> টাকা</span></div>
-        <p style="text-align:center; font-size:11px; margin-top:15px; font-weight: bold;">--- ধন্যবাদ ---</p>
+    <div class="main-content" id="printArea">
+        <div class="header">
+            <div style="font-size: 30px;">🏠</div>
+            <h1>বিসমিল্লাহ ভিলা</h1>
+            <p>৭৪০/১ গাছা ইসলামপুর মসজিদ রোড, গাজীপুর।</p>
+            <p>মোবাইল: ০১৭১৫৬৫৩০৫৬</p>
+        </div>
+
+        <label>ভাড়াটিয়ার নাম:</label>
+        <select id="tenantName"></select>
+
+        <label>দোকান/ফ্ল্যাট নম্বর:</label>
+        <input type="text" id="flatNo" placeholder="যেমন: ফ্ল্যাট-এ১">
+
+        <label>মাসের নাম:</label>
+        <select id="billMonth">
+            <option>জানুয়ারি</option><option>ফেব্রুয়ারি</option><option>মার্চ</option><option>এপ্রিল</option>
+            <option>মে</option><option>জুন</option><option>জুলাই</option><option>আগস্ট</option>
+            <option>সেপ্টেম্বর</option><option>অক্টোবর</option><option>নভেম্বর</option><option>ডিসেম্বর</option>
+        </select>
+
+        <label>বর্তমান রিডিং:</label>
+        <input type="number" id="present" placeholder="00">
+
+        <label>পূর্বের রিডিং:</label>
+        <input type="number" id="previous" placeholder="00">
+
+        <label>পূর্ববর্তী বকেয়া (টাকা):</label>
+        <input type="number" id="arrear" value="0">
+
+        <div class="btn-group">
+            <button class="calc-btn" onclick="calculateBill()">হিসাব ও রসিদ তৈরি</button>
+            <button class="download-btn" id="dBtn" onclick="downloadImage()">ছবি ডাউনলোড</button>
+            <button class="print-btn" id="pBtn" onclick="window.print()">প্রিন্ট</button>
+        </div>
+
+        <div id="output" class="result-area" style="display:none;">
+            <div style="text-align:center; font-weight:bold; margin-bottom:10px;">বিদ্যুৎ বিল রসিদ - <span id="resMonth"></span></div>
+            <div class="res-row"><span>ভাড়াটিয়া:</span> <strong id="resName"></strong></div>
+            <div class="res-row"><span>দোকান/ফ্ল্যাট:</span> <span id="resFlat"></span></div>
+            <hr>
+            <div class="res-row"><span>ব্যবহৃত ইউনিট:</span> <strong id="usedUnits">০</strong></div>
+            <div class="res-row"><span>বিদ্যুৎ বিল:</span> <span id="energy">০</span></div>
+            <div class="res-row"><span>ডিমান্ড ও মিটার চার্জ:</span> <span>৬০ টাকা</span></div>
+            <div class="res-row"><span>ভ্যাট (৫%):</span> <span id="vat">০</span></div>
+            <div class="res-row"><span>পূর্ববর্তী বকেয়া:</span> <span id="resArrear">০</span></div>
+            <div class="res-row total"><span>মোট প্রদেয় বিল:</span> <span id="total">০</span> টাকা</div>
+            
+            <div class="footer-sign">
+                <div class="sign-line">ভাড়াটিয়ার স্বাক্ষর</div>
+                <div class="sign-line">মালিকের স্বাক্ষর</div>
+            </div>
+            <p style="text-align:center; font-size:10px; margin-top:15px; color:#666;">তারিখ: <span id="resDate"></span></p>
+        </div>
     </div>
 </div>
 
 <script>
+    // ড্রপডাউন আপডেট করার ফাংশন
+    function updateDropdown() {
+        const input = document.getElementById('tenantListInput').value;
+        const names = input.split(',');
+        const select = document.getElementById('tenantName');
+        select.innerHTML = "";
+        names.forEach(name => {
+            let opt = document.createElement('option');
+            opt.value = name.trim();
+            opt.innerHTML = name.trim();
+            select.appendChild(opt);
+        });
+        localStorage.setItem('tenantList', input); // ফোনে সেভ থাকবে
+    }
+
+    // পেজ লোড হলে আগের নামগুলো আনা
+    window.onload = function() {
+        const saved = localStorage.getItem('tenantList');
+        if(saved) document.getElementById('tenantListInput').value = saved;
+        updateDropdown();
+    };
+
     function toBanglaNum(num) {
-        if(num === null || num === undefined) return '০';
         const banglaDigits = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
         return num.toString().replace(/\d/g, d => banglaDigits[d]);
     }
 
-    const now = new Date();
-    document.getElementById('currentDate').innerText = toBanglaNum(now.getDate()) + "/" + toBanglaNum(now.getMonth() + 1) + "/" + toBanglaNum(now.getFullYear());
-
     function calculateBill() {
         let pres = parseFloat(document.getElementById('present').value);
         let prev = parseFloat(document.getElementById('previous').value);
+        let arrear = parseFloat(document.getElementById('arrear').value) || 0;
         
         if (isNaN(pres) || isNaN(prev) || pres < prev) {
             alert("সঠিক রিডিং দিন"); return;
@@ -95,7 +141,6 @@
 
         let units = pres - prev;
         let energy = 0;
-        
         if (units <= 50) energy = units * 4.63;
         else if (units <= 75) energy = units * 5.26;
         else if (units <= 200) energy = units * 7.20;
@@ -105,15 +150,41 @@
         else energy = units * 14.61;
 
         let vat = (energy + 60) * 0.05;
-        let total = energy + 60 + vat;
+        let grandTotal = energy + 60 + vat + arrear;
 
+        // ডাটা বসানো
+        document.getElementById('resName').innerText = document.getElementById('tenantName').value;
+        document.getElementById('resFlat').innerText = document.getElementById('flatNo').value;
+        document.getElementById('resMonth').innerText = document.getElementById('billMonth').value;
         document.getElementById('usedUnits').innerText = toBanglaNum(units);
         document.getElementById('energy').innerText = toBanglaNum(energy.toFixed(2));
         document.getElementById('vat').innerText = toBanglaNum(vat.toFixed(2));
-        document.getElementById('total').innerText = toBanglaNum(Math.round(total));
-        
+        document.getElementById('resArrear').innerText = toBanglaNum(arrear);
+        document.getElementById('total').innerText = toBanglaNum(Math.round(grandTotal));
+        document.getElementById('resDate').innerText = toBanglaNum(new Date().toLocaleDateString('bn-BD'));
+
         document.getElementById('output').style.display = 'block';
+        document.getElementById('dBtn').style.display = 'block';
         document.getElementById('pBtn').style.display = 'block';
+    }
+
+    // ইমেজ হিসেবে ডাউনলোড করার ফাংশন
+    function downloadImage() {
+        const element = document.getElementById('printArea');
+        // ইনপুট বক্সগুলো সাময়িক লুকানো
+        const inputs = element.querySelectorAll('input, select, .btn-group, label');
+        inputs.forEach(el => el.style.display = 'none');
+        
+        html2canvas(element).then(canvas => {
+            const link = document.createElement('a');
+            link.download = 'বিদ্যুৎ-বিল-' + document.getElementById('tenantName').value + '.png';
+            link.href = canvas.toDataURL();
+            link.click();
+            
+            // আবার ফিরিয়ে আনা
+            inputs.forEach(el => el.style.display = 'block');
+            document.getElementById('output').style.display = 'block';
+        });
     }
 </script>
 
