@@ -6,34 +6,46 @@
     <title>বিদ্যুৎ বিল - বিসমিল্লাহ ভিলা</title>
     <style>
         body { font-family: 'Arial', sans-serif; background-color: #f4f4f4; display: flex; justify-content: center; padding: 15px; margin: 0; }
-        .card { background: white; padding: 20px; border-radius: 10px; width: 100%; max-width: 350px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .card { background: white; padding: 20px; border-radius: 12px; width: 100%; max-width: 350px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border-top: 5px solid #2e7d32; }
+        
+        /* লোগো আইকন স্টাইল */
+        .logo-icon { 
+            text-align: center; 
+            font-size: 50px; 
+            color: #2e7d32; 
+            margin-bottom: 5px; 
+        }
+
         .header { text-align: center; border-bottom: 1px dashed #000; padding-bottom: 10px; margin-bottom: 15px; }
-        .header h1 { margin: 0; font-size: 22px; color: #1b5e20; }
-        .header p { margin: 3px 0; font-size: 13px; color: #333; line-height: 1.4; }
+        .header h1 { margin: 0; font-size: 24px; color: #1b5e20; }
+        .header p { margin: 3px 0; font-size: 13px; color: #333; font-weight: bold; }
         
         label { font-weight: bold; font-size: 14px; display: block; margin-top: 12px; color: #444; }
-        input { width: 100%; padding: 12px; margin: 5px 0; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; font-size: 16px; }
+        input { width: 100%; padding: 12px; margin: 5px 0; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; font-size: 16px; background: #fafafa; }
         
         .btn-group { display: flex; gap: 8px; margin-top: 15px; }
-        button { flex: 1; padding: 12px; border: none; border-radius: 5px; cursor: pointer; font-size: 15px; font-weight: bold; }
+        button { flex: 1; padding: 12px; border: none; border-radius: 8px; cursor: pointer; font-size: 15px; font-weight: bold; transition: 0.3s; }
         .calc-btn { background: #2e7d32; color: white; }
         .print-btn { background: #000; color: white; display: none; }
+        button:active { transform: scale(0.98); }
 
         .result { margin-top: 20px; border-top: 1px solid #eee; padding-top: 10px; }
         .res-row { display: flex; justify-content: space-between; font-size: 15px; margin-bottom: 6px; color: #333; }
-        .total { font-size: 19px; font-weight: bold; color: #d32f2f; border-top: 2px solid #000; padding-top: 8px; margin-top: 10px; }
+        .total { font-size: 20px; font-weight: bold; color: #d32f2f; border-top: 2px solid #000; padding-top: 8px; margin-top: 10px; }
 
         @media print {
             body { background: white; padding: 0; margin: 0; }
             input, .calc-btn, .print-btn, label { display: none !important; }
             .card { box-shadow: none; border: none; width: 100%; max-width: 100%; padding: 0; }
-            .header h1 { font-size: 20px; }
+            .logo-icon { color: black; } /* প্রিন্টারে কালো আসবে */
         }
     </style>
 </head>
 <body>
 
 <div class="card" id="printArea">
+    <div class="logo-icon">🏠</div>
+    
     <div class="header">
         <h1>বিসমিল্লাহ ভিলা</h1>
         <p>৭৪০/১ গাছা ইসলামপুর মসজিদ রোড,<br>বোর্ডবাজার, গাজীপুর।</p>
@@ -59,35 +71,31 @@
         <div class="res-row"><span>মিটার ভাড়া:</span> <span>১০ টাকা</span></div>
         <div class="res-row"><span>ভ্যাট (৫%):</span> <span><span id="vat">০</span> টাকা</span></div>
         <div class="res-row total"><span>সর্বমোট বিল:</span> <span><span id="total">০</span> টাকা</span></div>
-        <p style="text-align:center; font-size:11px; margin-top:15px; font-weight: bold;">ধন্যবাদ - বিসমিল্লাহ ভিলা</p>
+        <p style="text-align:center; font-size:11px; margin-top:15px; font-weight: bold;">--- ধন্যবাদ ---</p>
     </div>
 </div>
 
 <script>
-    // সংখ্যাকে বাংলায় রূপান্তর করার ফাংশন
     function toBanglaNum(num) {
         if(num === null || num === undefined) return '০';
         const banglaDigits = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
         return num.toString().replace(/\d/g, d => banglaDigits[d]);
     }
 
-    // আজকের তারিখ সেট করা
     const now = new Date();
-    const dateStr = toBanglaNum(now.getDate()) + "/" + toBanglaNum(now.getMonth() + 1) + "/" + toBanglaNum(now.getFullYear());
-    document.getElementById('currentDate').innerText = dateStr;
+    document.getElementById('currentDate').innerText = toBanglaNum(now.getDate()) + "/" + toBanglaNum(now.getMonth() + 1) + "/" + toBanglaNum(now.getFullYear());
 
     function calculateBill() {
         let pres = parseFloat(document.getElementById('present').value);
         let prev = parseFloat(document.getElementById('previous').value);
         
         if (isNaN(pres) || isNaN(prev) || pres < prev) {
-            alert("অনুগ্রহ করে সঠিক রিডিং প্রদান করুন।"); return;
+            alert("সঠিক রিডিং দিন"); return;
         }
 
         let units = pres - prev;
         let energy = 0;
         
-        // পল্লী বিদ্যুৎ আবাসিক ট্যারিফ রেট (Tariff-A)
         if (units <= 50) energy = units * 4.63;
         else if (units <= 75) energy = units * 5.26;
         else if (units <= 200) energy = units * 7.20;
@@ -96,12 +104,9 @@
         else if (units <= 600) energy = units * 12.67;
         else energy = units * 14.61;
 
-        let demandCharge = 50;
-        let meterRent = 10;
-        let vat = (energy + demandCharge + meterRent) * 0.05;
-        let total = energy + demandCharge + meterRent + vat;
+        let vat = (energy + 60) * 0.05;
+        let total = energy + 60 + vat;
 
-        // ফলাফলগুলো বাংলায় প্রদর্শন
         document.getElementById('usedUnits').innerText = toBanglaNum(units);
         document.getElementById('energy').innerText = toBanglaNum(energy.toFixed(2));
         document.getElementById('vat').innerText = toBanglaNum(vat.toFixed(2));
