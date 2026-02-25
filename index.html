@@ -45,7 +45,7 @@
 <div class="container">
     <div class="config-section" id="config">
         <strong>ভাড়াটিয়া তালিকা (মাস্টার সেটিংস):</strong><br>
-        <input type="text" id="tenantListInput" value="দোকান-০১, দোকান-০২, মিলন">
+        <input type="text" id="tenantListInput" value="দোকান-০১, দোকান-০২, রুমি ইসলাম, শামীম ইসলাম, সাজ্জাদ ইসলাম, নূর ইসলাম, মিলন, সাকিব">
     </div>
 
     <div class="main-content" id="printArea">
@@ -177,8 +177,8 @@
         else if (units <= 600) energy = units * 12.67;
         else energy = units * 14.61;
 
-        let vat = (energy + 60) * 0.05;
-        let grandTotal = energy + 60 + vat + arrear;
+        let vat = (energy + 42) * 0.05;
+        let grandTotal = energy + 42 + vat + arrear;
 
         const now = new Date();
         // রসিদ আইডি তৈরি
