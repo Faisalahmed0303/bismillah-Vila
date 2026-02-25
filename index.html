@@ -3,39 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>বিসমিল্লাহ ভিলা - সঠিক বিল ক্যালকুলেটর</title>
+    <title>বিসমিল্লাহ ভিলা - স্মার্ট রসিদ</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         body { font-family: 'Arial', sans-serif; background-color: #f0f2f5; padding: 10px; margin: 0; }
-        .container { max-width: 450px; margin: auto; background: #fff; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border-top: 6px solid #2e7d32; }
+        .container { max-width: 450px; margin: auto; background: #fff; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border-top: 6px solid #2e7d32; overflow: hidden; }
         .config-section { background: #e8f5e9; padding: 15px; border-bottom: 1px solid #ddd; font-size: 13px; }
         .main-content { padding: 20px; }
         .header { text-align: center; border-bottom: 1px dashed #000; padding-bottom: 10px; margin-bottom: 15px; }
         .header h1 { margin: 0; font-size: 24px; color: #1b5e20; }
         
-        input, select { width: 100%; padding: 10px; margin: 5px 0; border: 1px solid #ccc; border-radius: 6px; font-size: 15px; box-sizing: border-box; }
-        label { font-weight: bold; font-size: 13px; display: block; margin-top: 10px; }
+        label { font-weight: bold; font-size: 13px; display: block; margin-top: 10px; color: #333; }
+        input, select { width: 100%; padding: 10px; margin: 5px 0; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; font-size: 15px; }
         
         .btn-group { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 15px; }
-        button { flex: 1; padding: 12px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        button { flex: 1; min-width: 100px; padding: 12px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 14px; }
         .calc-btn { background: #2e7d32; color: white; }
         .download-btn { background: #1976d2; color: white; display: none; }
+        .print-btn { background: #333; color: white; display: none; }
 
         .result-area { margin-top: 20px; padding: 15px; background: white; border: 2px solid #eee; border-radius: 8px; }
         .res-row { display: flex; justify-content: space-between; font-size: 15px; margin-bottom: 6px; }
-        .total-box { background: #1b5e20; color: white; padding: 12px; border-radius: 8px; margin-top: 15px; display: flex; justify-content: space-between; font-weight: bold; font-size: 18px; }
+        .reading-box { background: #f9f9f9; padding: 10px; border-radius: 5px; margin: 10px 0; border: 1px solid #eee; }
+        .total-box { background: #1b5e20; color: white; padding: 12px; border-radius: 8px; margin-top: 15px; display: flex; justify-content: space-between; align-items: center; }
+        .total-box span { font-size: 18px; font-weight: bold; }
         
-        .footer-sign { margin-top: 35px; display: flex; justify-content: space-between; }
+        .footer-sign { margin-top: 35px; display: flex; justify-content: space-between; padding-top: 20px; }
         .sign-line { border-top: 1px solid #000; width: 110px; text-align: center; font-size: 12px; font-weight: bold; }
         .thanks-note { text-align: center; font-size: 15px; font-weight: bold; margin-top: 25px; color: #1b5e20; border-top: 1px dashed #ccc; padding-top: 10px; }
+
+        @media print {
+            @page { size: auto; margin: 5mm; }
+            .config-section, input, select, .btn-group, label, .header div { display: none !important; }
+            body { background: white; padding: 0; }
+            .container { box-shadow: none; border: none; width: 100%; max-width: 100%; }
+            .total-box { background: transparent !important; color: black !important; border: 2px solid black; }
+        }
     </style>
 </head>
 <body>
 
 <div class="container">
     <div class="config-section" id="config">
-        <strong>ভাড়াটিয়া তালিকা (মাস্টার সেটিংস):</strong>
-        <input type="text" id="tenantListInput" value="দোকান-০১, দোকান-০২, মিলন">
+        <strong>মাস্টার সেটিংস:</strong><br>
+        <input type="text" id="tenantListInput" value="দোকান-০১, দোকান-০২, মিলন" onchange="updateDropdown()">
     </div>
 
     <div class="main-content" id="printArea">
@@ -43,12 +54,13 @@
             <div style="font-size: 35px;">🏠</div>
             <h1>বিসমিল্লাহ ভিলা</h1>
             <p>৭৪০/১ গাছা ইসলামপুর মসজিদ রোড, গাজীপুর।</p>
+            <p>মোবাইল: ০১৭১৫৬৫৩০৫৬</p>
         </div>
 
-        <label>ভাড়াটিয়া ও ফ্ল্যাট:</label>
+        <label>ভাড়াটিয়া:</label>
         <select id="tenantName"></select>
-        <input type="text" id="flatNo" placeholder="ফ্ল্যাট/দোকান নম্বর">
-        
+        <input type="text" id="flatNo" placeholder="দোকান/ফ্ল্যাট নম্বর">
+
         <label>বিলের মাস:</label>
         <select id="billMonth">
             <option>জানুয়ারি</option><option>ফেব্রুয়ারি</option><option>মার্চ</option><option>এপ্রিল</option>
@@ -56,14 +68,15 @@
             <option>সেপ্টেম্বর</option><option>অক্টোবর</option><option>নভেম্বর</option><option>ডিসেম্বর</option>
         </select>
 
-        <label>রিডিং হিসাব:</label>
+        <label>রিডিং:</label>
         <input type="number" id="present" placeholder="বর্তমান রিডিং">
         <input type="number" id="previous" placeholder="পূর্বের রিডিং">
-        <input type="number" id="arrear" value="0" placeholder="বকেয়া টাকা">
+        <input type="number" id="arrear" value="0" placeholder="বকেয়া">
 
         <div class="btn-group">
-            <button class="calc-btn" onclick="calculateBill()">সঠিক বিল তৈরি করুন</button>
+            <button class="calc-btn" onclick="calculateBill()">রসিদ তৈরি করুন</button>
             <button class="download-btn" id="dBtn" onclick="downloadImage()">ছবি ডাউনলোড</button>
+            <button class="print-btn" id="pBtn" onclick="window.print()">প্রিন্ট করুন</button>
         </div>
 
         <div id="output" class="result-area" style="display:none;">
@@ -79,12 +92,16 @@
 
             <div class="res-row"><span>ভাড়াটিয়া:</span> <strong id="resName"></strong></div>
             <div class="res-row"><span>নং:</span> <strong id="resFlat"></strong></div>
-            <hr>
-            <div class="res-row"><span>বর্তমান রিডিং:</span> <span id="resPres"></span></div>
-            <div class="res-row"><span>পূর্বের রিডিং:</span> <span id="resPrev"></span></div>
-            <div class="res-row" style="font-weight:bold;"><span>মোট ব্যবহৃত ইউনিট:</span> <span id="usedUnits"></span></div>
-            <hr>
-            <div class="res-row"><span>বিদ্যুৎ বিল (ধাপ অনুযায়ী):</span> <span id="energy"></span></div>
+            
+            <div class="reading-box">
+                <div class="res-row"><span>বর্তমান রিডিং:</span> <span id="resPres"></span></div>
+                <div class="res-row"><span>পূর্বের রিডিং:</span> <span id="resPrev"></span></div>
+                <div class="res-row" style="font-weight:bold; border-top:1px solid #ccc; padding-top:5px; margin-top:5px;">
+                    <span>ব্যবহৃত ইউনিট:</span> <span id="usedUnits"></span>
+                </div>
+            </div>
+
+            <div class="res-row"><span>বিদ্যুৎ বিল (স্ল্যাব অনুযায়ী):</span> <span id="energy"></span></div>
             <div class="res-row"><span>ডিমান্ড ও মিটার চার্জ:</span> <span>৬০.০০ টাকা</span></div>
             <div class="res-row"><span>ভ্যাট (৫%):</span> <span id="vat"></span></div>
             <div class="res-row" style="color:red;"><span>পূর্ববর্তী বকেয়া:</span> <span id="resArrear"></span></div>
@@ -126,8 +143,6 @@
         updateDropdown();
     };
 
-    document.getElementById('tenantListInput').addEventListener('input', updateDropdown);
-
     function toBanglaNum(num) {
         const banglaDigits = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
         return num.toString().replace(/\d/g, d => banglaDigits[d]);
@@ -145,19 +160,15 @@
         let units = pres - prev;
         let energy = 0;
 
-        // সরকারি স্ল্যাব অনুযায়ী ধাপে ধাপে হিসাব (Slab Wise Calculation)
+        // সরকারি স্ল্যাব অনুযায়ী ধাপে ধাপে হিসাব (আপনার ১৭০ ইউনিটের বাস্তব হিসাব অনুযায়ী)
         if (units <= 75) {
             energy = units * 5.26;
         } else if (units <= 200) {
             energy = (75 * 5.26) + ((units - 75) * 7.20);
         } else if (units <= 300) {
             energy = (75 * 5.26) + (125 * 7.20) + ((units - 200) * 7.59);
-        } else if (units <= 400) {
-            energy = (75 * 5.26) + (125 * 7.20) + (100 * 7.59) + ((units - 300) * 8.02);
-        } else if (units <= 600) {
-            energy = (75 * 5.26) + (125 * 7.20) + (100 * 7.59) + (100 * 8.02) + ((units - 400) * 12.67);
         } else {
-            energy = (75 * 5.26) + (125 * 7.20) + (100 * 7.59) + (100 * 8.02) + (200 * 12.67) + ((units - 600) * 14.61);
+            energy = (75 * 5.26) + (125 * 7.20) + (100 * 7.59) + ((units - 300) * 8.02);
         }
 
         let vat = (energy + 42) * 0.05;
@@ -180,7 +191,8 @@
         document.getElementById('total').innerText = toBanglaNum(Math.round(grandTotal)) + " টাকা";
 
         document.getElementById('output').style.display = 'block';
-        document.getElementById('dBtn').style.display = 'block';
+        document.getElementById('dBtn').style.display = 'inline-block';
+        document.getElementById('pBtn').style.display = 'inline-block';
     }
 
     function downloadImage() {
