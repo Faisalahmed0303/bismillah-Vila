@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>বিসমিল্লাহ ভিলা - স্মার্ট রসিদ</title>
+    <title>বিসমিল্লাহ ভিলা - আপডেট রসিদ</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         body { font-family: 'Arial', sans-serif; background-color: #f0f2f5; padding: 10px; margin: 0; }
@@ -33,10 +33,9 @@
         .thanks-note { text-align: center; font-size: 15px; font-weight: bold; margin-top: 25px; color: #1b5e20; border-top: 1px dashed #ccc; padding-top: 10px; }
 
         @media print {
-            @page { size: auto; margin: 5mm; }
             .config-section, input, select, .btn-group, label, .header div { display: none !important; }
             body { background: white; padding: 0; }
-            .container { box-shadow: none; border: none; width: 100%; max-width: 100%; }
+            .container { box-shadow: none; border: none; width: 100%; }
             .total-box { background: transparent !important; color: black !important; border: 2px solid black; }
         }
     </style>
@@ -45,7 +44,7 @@
 
 <div class="container">
     <div class="config-section" id="config">
-        <strong>মাস্টার সেটিংস:</strong><br>
+        <strong>মাস্টার সেটিংস (নামগুলো কমা দিয়ে লিখুন):</strong><br>
         <input type="text" id="tenantListInput" value="দোকান-০১, দোকান-০২, মিলন" onchange="updateDropdown()">
     </div>
 
@@ -102,7 +101,7 @@
             </div>
 
             <div class="res-row"><span>বিদ্যুৎ বিল (স্ল্যাব অনুযায়ী):</span> <span id="energy"></span></div>
-            <div class="res-row"><span>ডিমান্ড ও মিটার চার্জ:</span> <span>৬০.০০ টাকা</span></div>
+            <div class="res-row"><span>ডিমান্ড চার্জ:</span> <span>৪২.০০ টাকা</span></div>
             <div class="res-row"><span>ভ্যাট (৫%):</span> <span id="vat"></span></div>
             <div class="res-row" style="color:red;"><span>পূর্ববর্তী বকেয়া:</span> <span id="resArrear"></span></div>
             
@@ -160,7 +159,7 @@
         let units = pres - prev;
         let energy = 0;
 
-        // সরকারি স্ল্যাব অনুযায়ী ধাপে ধাপে হিসাব (আপনার ১৭০ ইউনিটের বাস্তব হিসাব অনুযায়ী)
+        // সরকারি স্ল্যাব হিসাব
         if (units <= 75) {
             energy = units * 5.26;
         } else if (units <= 200) {
@@ -171,8 +170,9 @@
             energy = (75 * 5.26) + (125 * 7.20) + (100 * 7.59) + ((units - 300) * 8.02);
         }
 
-        let vat = (energy + 42) * 0.05;
-        let grandTotal = energy + 42 + vat + arrear;
+        let demandCharge = 42; 
+        let vat = (energy + demandCharge) * 0.05;
+        let grandTotal = energy + demandCharge + vat + arrear;
 
         const now = new Date();
         document.getElementById('resName').innerText = document.getElementById('tenantName').value;
